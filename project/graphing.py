@@ -73,7 +73,23 @@ def main():
         sea_level.append(float(line[5]))
 
     plotData("Sea Level change in Millimeters", year, sea_level, "Global Sea Level Change")
+    infile.close()
+##########################################################################################
 
+    infile = open("global_co2.txt", 'r')
+
+    #reading a line right here skips the first line in the file
+    infile.readline()
+    year = []
+    co2_level = []
+    for line in infile:
+        line = line.strip().split()
+
+        year.append(float(line[2]))
+        co2_level.append(float(line[3]))
+
+    plotData("CO2 Level change in PPM", year, co2_level, "Global CO2 Level Change")
+    infile.close()
 
 
 

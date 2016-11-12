@@ -40,7 +40,7 @@ def main():
 
 
 
-
+    """
 ###########################################################################################
     infile = open("avg_global_temp.txt", 'r')
 
@@ -91,7 +91,33 @@ def main():
     plotData("CO2 Level change in PPM", year, co2_level, "Global CO2 Level Change")
     infile.close()
 
+    #######################################################################################
+    """
+    infile = open("CO2Data.txt", 'r')
+    
+    #reading a line right here skips the first line in the file
+    infile.readline()
+    year == []
+    co2_level = []
+    country = ""
 
+    for line in infile:
+        line = line.strip().split()
 
+        currentCountry = line[0]
+
+        #checks if it's a new country so I can create a new graph
+        if currentCountry != country:
+            if country != "":
+                plotData("CO2 Level Change in PPM", year, co2_level, country + " CO2 Level Change")                
+            country = currentCountry
+            year = []
+            co2_level = []
+
+        year.append(int(line[2]))
+        co2_level.append(float(line[3]))
+        
+    plotData("CO2 Level Change in PPM", year, co2_level, currentCountry + " CO2 Level Change")                
+    
 
 main()

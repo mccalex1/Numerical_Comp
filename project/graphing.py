@@ -1,15 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
+colors = ["green", "brown", "silver", "red", "orange", "yellow", "black", "blue", "cyan", "indigo", "violet"]
+count = 0
 
-def plotData(country, year, data, title):
+def plotData(dataName, year, data):
+    global count
 
-    plt.title(country + " " + title + " vs Years")
-
-    plt.plot(year, data, marker='o', linestyle='--', color='b', label=title)
-    plt.ylabel(title)
-    plt.xlabel("Years")
-
-    plt.show()
+    
+    plt.plot(year, data, marker='o', color=colors[count], linestyle='--', label = dataName)#"C02 Level Changes")#, color='b', label=title)
 
     return 0
 
@@ -19,29 +17,21 @@ def linearModel(year, data):
     return 0
 
 
-#polyfit                                                                                                               
-def doFit(x, y, n):
-    return np.polyfit(np.array(x), np.array(y), n)
-
-
 
 
 def main():
 
-    country = "USA"
-    year = [1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015]
-    other = [3, 6, 7, 10, 16, 18, 23, 30]
-    title = "Sea Level"
+    plotAvgGlobalTemp()
+    plotSeaLevel()
+    plotGlobalCo2()
+    plotCo2Data()
 
-#    plotData(country, year, other, title)
-#    linearModel(year, other)
     
 
 
 
+def plotAvgGlobalTemp():    
 
-    """
-###########################################################################################
     infile = open("avg_global_temp.txt", 'r')
 
     #reading a line right here skips the first line in the file
@@ -56,9 +46,36 @@ def main():
         
         
 
-    plotData("Temperature change in Degrees Celcius", year, avg_global_temp, "Global Temperature Change")
+    plotData("Temperature change in Degrees Celcius", year, avg_global_temp)
     infile.close()
-###########################################################################################
+
+
+    ####polyfit###
+    x = np.array(year)
+    y = np.array(avg_global_temp)
+    z = np.polyfit(x, y, 1)
+
+    p = np.poly1d(z)
+
+    xp = np.linspace(1992, 2032, 100)
+    
+    plt.plot(xp, p(xp), '-')    
+    ###
+    
+    plt.ylabel("Temperature Change (C) From " + str(int(year[0])))
+    plt.xlabel("Years")
+
+    plt.title("Global Temperature in Degrees Celcius")
+
+    plt.legend()
+
+    plt.show()
+
+
+
+
+
+def plotSeaLevel():
 
     infile = open("sea_level.txt", 'r')
     
@@ -72,9 +89,35 @@ def main():
         year.append(float(line[2]))
         sea_level.append(float(line[5]))
 
-    plotData("Sea Level change in Millimeters", year, sea_level, "Global Sea Level Change")
+    plotData("Sea Level change in Millimeters", year, sea_level)
     infile.close()
-##########################################################################################
+
+    ####polyfit###                                                                
+    x = np.array(year)
+    y = np.array(sea_level)
+    z = np.polyfit(x, y, 1)
+
+    p = np.poly1d(z)
+
+    xp = np.linspace(1992, 2032, 100)
+
+    plt.plot(xp, p(xp), '-')
+    ### 
+
+    plt.ylabel("Sea Level Change (mm) From " + str(int(year[0])))
+    plt.xlabel("Years")
+
+    plt.title("Global Sea Level change in Millimeters")
+
+    plt.legend()
+
+    plt.show()
+
+
+
+
+
+def plotGlobalCo2():
 
     infile = open("global_co2.txt", 'r')
 
@@ -88,16 +131,43 @@ def main():
         year.append(float(line[2]))
         co2_level.append(float(line[3]))
 
-    plotData("CO2 Level change in PPM", year, co2_level, "Global CO2 Level Change")
+    plotData("CO2 Level change in PPM", year, co2_level)
     infile.close()
 
-    #######################################################################################
-    """
+    ####polyfit###                                                                
+    x = np.array(year)
+    y = np.array(co2_level)
+    z = np.polyfit(x, y, 1)
+
+    p = np.poly1d(z)
+
+    xp = np.linspace(1992, 2032, 100)
+
+    plt.plot(xp, p(xp), '-')
+    ### 
+
+    plt.ylabel("CO2 PPM From " + str(int(year[0])))
+    plt.xlabel("Years")
+
+    plt.title("Global CO2 Level in PPM From " + str(int(year[0])))
+    
+    plt.legend()
+
+    plt.show()
+
+
+
+
+
+def plotCo2Data():
+
+    global count
+
     infile = open("CO2Data.txt", 'r')
     
     #reading a line right here skips the first line in the file
     infile.readline()
-    year == []
+    year = []
     co2_level = []
     country = ""
 
@@ -109,7 +179,8 @@ def main():
         #checks if it's a new country so I can create a new graph
         if currentCountry != country:
             if country != "":
-                plotData("CO2 Level Change in PPM", year, co2_level, country + " CO2 Level Change")                
+                plotData(country, year, co2_level)        
+                count += 1
             country = currentCountry
             year = []
             co2_level = []
@@ -117,7 +188,17 @@ def main():
         year.append(int(line[2]))
         co2_level.append(float(line[3]))
         
-    plotData("CO2 Level Change in PPM", year, co2_level, currentCountry + " CO2 Level Change")                
-    
+    plotData(country, year, co2_level)
+
+    plt.xlim(1992, 2020)
+    plt.ylim(0, 22)
+
+    plt.ylabel("CO2 Change in PPM")
+    plt.xlabel("Years")
+
+    plt.title("C02 Change in PPM Across Countries")
+    plt.legend()
+
+    plt.show()
 
 main()

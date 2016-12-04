@@ -1,7 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import time
+import sys
+
 colors = ["green", "brown", "silver", "red", "orange", "yellow", "black", "blue", "cyan", "indigo", "violet"]
 count = 0
+
 
 
 #simple function takes in title, x and y data
@@ -12,10 +16,18 @@ def plotData(dataName, x, y):
 
 
 def main():
+    
+    if len(sys.argv) != 2:
+        print("Usage: python graphing.py <Year>")
+        return 1
+
+    year = int(sys.argv[1])
+
+    start_time = time.time()
 
     #plot individual graphs
     plotAvgGlobalTemp()
-    plotSeaLevel()
+    SeaLevel = plotSeaLevel(year)
     plotGlobalCo2()
 
     #plot country co2 data
@@ -24,6 +36,9 @@ def main():
     #plot correlational graphs
     plotTempCo2()
     plotTempSea()
+    
+    print("\nThe Projected Sea Level in", year, "is", SeaLevel)
+    print("--- %s seconds ---" % (time.time() - start_time))
 
 
 #Reads in from file
@@ -210,13 +225,13 @@ def plotAvgGlobalTemp():
     plt.legend()
 
     plt.show()
-
+    
 
 
 
 #takes sea level and corresponding year
 #outputs graph using pyplot
-def plotSeaLevel():
+def plotSeaLevel(yearChosen):
 
     infile = open("sea_level.txt", 'r')
     
@@ -276,6 +291,7 @@ def plotSeaLevel():
     plt.show()
 
 
+    return float(z[0]) * float(yearChosen) + float(z[1])
 
 
 #takes co2 and corresponding years
@@ -354,7 +370,7 @@ def plotGlobalCo2():
     plt.legend()
 
     plt.show()
-
+    
 
 
 

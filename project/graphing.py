@@ -27,24 +27,29 @@ def main():
 
     #plot individual graphs
     plotAvgGlobalTemp()
-    SeaLevel = plotSeaLevel(year)
-    plotGlobalCo2()
+    plotSeaLevel()
+    
+    projectedCo2 = plotGlobalCo2(year)
 
     #plot country co2 data
     plotCo2Data()
 
     #plot correlational graphs
-    plotTempCo2()
-    plotTempSea()
-    
-    print("\nThe Projected Sea Level in", year, "is", SeaLevel)
+    projectedTemp = plotTempCo2(projectedCo2)
+    SeaLevel = plotTempSea(projectedTemp)
+
+    if(year > 2016):
+        print("\nThe Projected Sea Level in", year, "is", SeaLevel)
+    else:
+        print("Cannot Project Sea Level for a year less than 2016")
+
     print("--- %s seconds ---" % (time.time() - start_time))
 
 
 #Reads in from file
 #pulls out all temperature and co2 data
 #plots the data co2 on x, temperature on y
-def plotTempCo2():
+def plotTempCo2(projectedCo2):
 
     infile = open("allData.txt", 'r')
     infile.readline()
@@ -99,11 +104,12 @@ def plotTempCo2():
     plt.legend()
     plt.show()
 
+    return float(z[0]) * float(projectedCo2) + float(z[1])
 
 #Reads in from file
 #pulls out all temperature and sea data
 #plots the temperature on x, sea on y
-def plotTempSea():
+def plotTempSea(projectedTemp):
 
     infile = open("allData.txt", 'r')
     infile.readline()
@@ -158,6 +164,7 @@ def plotTempSea():
     plt.legend()
     plt.show()
 
+    return float(z[0]) * float(projectedTemp) + float(z[1])
 
 #reads in from file and takes out all the temperatures and corresponding years
 #then plots data using pyplot in a graph
@@ -231,7 +238,7 @@ def plotAvgGlobalTemp():
 
 #takes sea level and corresponding year
 #outputs graph using pyplot
-def plotSeaLevel(yearChosen):
+def plotSeaLevel():
 
     infile = open("sea_level.txt", 'r')
     
@@ -291,12 +298,9 @@ def plotSeaLevel(yearChosen):
     plt.show()
 
 
-    return float(z[0]) * float(yearChosen) + float(z[1])
-
-
 #takes co2 and corresponding years
 #outputs graph using pyplot
-def plotGlobalCo2():
+def plotGlobalCo2(yearChosen):
 
     infile = open("global_co2.txt", 'r')
 
@@ -371,7 +375,7 @@ def plotGlobalCo2():
 
     plt.show()
     
-
+    return float(z[0]) * float(yearChosen) + float(z[1])
 
 
 #takes co2 data from countries

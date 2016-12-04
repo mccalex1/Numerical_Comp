@@ -3,42 +3,44 @@ import numpy as np
 colors = ["green", "brown", "silver", "red", "orange", "yellow", "black", "blue", "cyan", "indigo", "violet"]
 count = 0
 
-def plotData(dataName, year, data):
+
+#simple function takes in title, x and y data
+def plotData(dataName, x, y):
     global count
-
     
-    plt.plot(year, data, marker='o', color=colors[count], linestyle='--', label = dataName)#"C02 Level Changes")#, color='b', label=title)
-
-    return 0
-
-
+    plt.plot(x, y, marker='o', color=colors[count], linestyle='--', label = dataName)
 
 
 def main():
 
+    #plot individual graphs
     plotAvgGlobalTemp()
     plotSeaLevel()
     plotGlobalCo2()
+
+    #plot country co2 data
     plotCo2Data()
 
+    #plot correlational graphs
     plotTempCo2()
-
     plotTempSea()
 
+
+#Reads in from file
+#pulls out all temperature and co2 data
+#plots the data co2 on x, temperature on y
 def plotTempCo2():
 
     infile = open("allData.txt", 'r')
     infile.readline()
 
-    years = []
     co2s = []
     temps = []
-    seas = []
 
+    #reads through file
     for line in infile:
         year, co2, temp, sea = line.strip().split()
 
-        years.append(int(year))
         co2s.append(float(co2))
         temps.append(float(temp))
             
@@ -46,10 +48,11 @@ def plotTempCo2():
     ####polyfit co2 and temp###                                                   
     x = np.array(co2s)
     y = np.array(temps)
-    z = np.polyfit(x, y, 1)
+    z, res, _, _, _ = np.polyfit(x, y, 1, full=True)
+    _, res2, _, _, _ = np.polyfit(x, y, 2, full=True)
 
     p = np.poly1d(z)
-
+    
     xp = np.linspace(300, 425, 100)
 
     plt.plot(xp, p(xp), '-', label="Best Fit")
@@ -57,17 +60,23 @@ def plotTempCo2():
     #statistical stuff                                               
     equation = 'y = ' + str(round(z[0],4)) + 'x' ' + ' + str(round(z[1],4))
 
+    #print to terminal
     print("CO2 vs Temp")
     print("Mean =", np.mean(y))
     print("Standard Deviation =", np.std(y))
     print("Variance =", np.var(y))
+    print("Error=", res)
+    print("Error with 2 degree=", res2)
     print()
 
+    #set up graph labels
     plt.title("CO2 VS Temperature")
     plt.xlabel("CO2 (PPM)")
     plt.ylabel("Temperature (C)")
     plt.scatter(co2s, temps, label="CO2 VS Temp")
     
+
+    #add line of best fit to graph
     plt.annotate(equation, xy=(362,.391), xytext=(300,1),
                  arrowprops=dict(facecolor='black', shrink=0.01))
 
@@ -75,6 +84,10 @@ def plotTempCo2():
     plt.legend()
     plt.show()
 
+
+#Reads in from file
+#pulls out all temperature and sea data
+#plots the temperature on x, sea on y
 def plotTempSea():
 
     infile = open("allData.txt", 'r')
@@ -95,7 +108,8 @@ def plotTempSea():
     x = np.array(temps)
     y = np.array(seas)
 
-    z = np.polyfit(x, y, 1)
+    z, res, _, _, _ = np.polyfit(x, y, 1, full=True)
+    _, res2, _, _, _ = np.polyfit(x, y, 2, full=True)
 
     p = np.poly1d(z)
 
@@ -106,16 +120,22 @@ def plotTempSea():
     #statistical stuff
     equation = 'y = ' + str(round(z[0],4)) + 'x' ' + ' + str(round(z[1],4))
 
+    #print to terminal
     print("Sea vs Temp")
     print("Mean =", np.mean(y))
     print("Standard Deviation =", np.std(y))
     print("Variance =", np.var(y))
-
+    print("Error=",res)
+    print("Error with 2 degree=", res2)
+    print()
+    
+    #set up graph labels
     plt.title("Sea Level VS Temperature")
     plt.xlabel("Temperature (C)")
     plt.ylabel("Sea Level (mm)")
     plt.scatter(temps, seas, label="Sea VS Temp")
 
+    #add line of best fit to graph
     plt.annotate(equation, xy=(.57, 22.7), xytext=(.2, 60),
                  arrowprops=dict(facecolor='black', shrink=0.01))
 
@@ -124,6 +144,8 @@ def plotTempSea():
     plt.show()
 
 
+#reads in from file and takes out all the temperatures and corresponding years
+#then plots data using pyplot in a graph
 def plotAvgGlobalTemp():    
 
     infile = open("avg_global_temp.txt", 'r')
@@ -140,14 +162,16 @@ def plotAvgGlobalTemp():
         
         
 
-    plotData("Temperature change in Degrees Celcius", year, avg_global_temp)
+    plotData("Temperature", year, avg_global_temp)
     infile.close()
 
 
     ####polyfit###
     x = np.array(year)
     y = np.array(avg_global_temp)
-    z = np.polyfit(x, y, 2)
+
+    _, res, _, _, _ = np.polyfit(x, y, 1, full=True)
+    z, res2, _, _, _ = np.polyfit(x, y, 2, full=True)
 
     p = np.poly1d(z)
 
@@ -160,21 +184,24 @@ def plotAvgGlobalTemp():
     stdDev = [np.std(y) for i in x]
     theVar = [np.var(y) for i in x]
 
-    #plt.plot(year, theMean, label="Mean", color="red") 
-    #plt.plot(year, stdDev, label="Std Dev", color="gold") 
-    #plt.plot(year, theVar, label="Var", color="magenta") 
-    equation = 'y = ' + str(round(z[0],4)) + 'x^2' ' + ' + str(round(z[1],4)) + 'x' + ' + ' + str(round(z[2],4))
-    
+
+    equation = 'y = ' + str(round(z[0],7)) + 'x^2' ' + ' + str(round(z[1],4)) + 'x' + ' + ' + str(round(z[2],4))
+
+    #prints to terminal
     print("Global Temperature")
     print("Mean =", np.mean(y))
     print("Standard Deviation =", np.std(y))
     print("Variance =", np.var(y))
+    print("Error=", res)
+    print("Error with 2 degree=",res2)
     print()
-    ###
+
     
+    #sets up x y axis labels
     plt.ylabel("Temperature Change (C)")
     plt.xlabel("Years")
 
+    #puts line of best fit equation on graph
     plt.annotate(equation, xy=(1945,-.143), xytext=(1900,1),
                  arrowprops=dict(facecolor='black', shrink=0.01))
 
@@ -187,7 +214,8 @@ def plotAvgGlobalTemp():
 
 
 
-
+#takes sea level and corresponding year
+#outputs graph using pyplot
 def plotSeaLevel():
 
     infile = open("sea_level.txt", 'r')
@@ -202,13 +230,15 @@ def plotSeaLevel():
         year.append(float(line[2]))
         sea_level.append(float(line[5]))
 
-    plotData("Sea Level change in Millimeters", year, sea_level)
+    plotData("Sea Level", year, sea_level)
     infile.close()
 
     ####polyfit###                                                                
     x = np.array(year)
     y = np.array(sea_level)
-    z = np.polyfit(x, y, 1)
+
+    z, res, _, _, _ = np.polyfit(x, y, 1, full=True)
+    _, res2, _, _, _ = np.polyfit(x, y, 2, full=True)
 
     p = np.poly1d(z)
 
@@ -219,19 +249,25 @@ def plotSeaLevel():
     #statistical stuff
     equation = 'y = ' + str(round(z[0],4)) + 'x' ' + ' + str(round(z[1],4))
 
+    #prints to terminal
     print("Sea Level")
     print("Mean =", np.mean(y))
     print("Standard Deviation =", np.std(y))
     print("Variance =", np.var(y))
+    print("Error=",res)
+    print("Error with 2=", res2)
     print()
 
-    ### 
-
+    
+    #sets up x y axis labels
     plt.ylabel("Sea Level Change (mm)")
     plt.xlabel("Years")
 
+
+    #puts line of best fit on graph
     plt.annotate(equation, xy=(2020,70.44), xytext=(2030,30),
                  arrowprops=dict(facecolor='black', shrink=0.01))
+
 
     plt.title("Global Sea Level change in Millimeters")
 
@@ -242,7 +278,8 @@ def plotSeaLevel():
 
 
 
-
+#takes co2 and corresponding years
+#outputs graph using pyplot
 def plotGlobalCo2():
 
     infile = open("global_co2.txt", 'r')
@@ -253,6 +290,8 @@ def plotGlobalCo2():
     co2_level = []
 
     count = 1
+    
+    #since theres so much data we only want 1 in 6 lines
     limitCount = [2, 3, 4, 5, 6]
 
     for line in infile:
@@ -271,13 +310,16 @@ def plotGlobalCo2():
         if(count == limitCount[-1] + 1):
             count = 1
 
-    plotData("CO2 Level change in PPM", year, co2_level)
+
+    plotData("CO2 Level", year, co2_level)
     infile.close()
 
     ####polyfit###                                                                
     x = np.array(year)
     y = np.array(co2_level)
-    z = np.polyfit(x, y, 1)
+
+    z, res, _, _, _ = np.polyfit(x, y, 1, full=True)
+    _, res2, _, _, _ = np.polyfit(x, y, 2, full=True)
 
     p = np.poly1d(z)
 
@@ -288,20 +330,24 @@ def plotGlobalCo2():
     #statistical stuff
     equation = 'y = ' + str(round(z[0],4)) + 'x' ' + ' + str(round(z[1],4))
 
+    #outputs to terminal
     print("CO2")
     print("Mean =", np.mean(y))
     print("Standard Deviation =", np.std(y))
     print("Variance =", np.var(y))
     print("Line of Best Fit= " + equation)
+    print("Error=",res)
+    print("Error with 2=",res2)
     print()
 
-    ### 
 
+    #sets up x y axis labels
     plt.ylabel("CO2 (PPM)")
     plt.xlabel("Years")
 
     plt.title("Global CO2 Level in PPM From " + str(int(year[0])))
 
+    #puts line of best fit in graph
     plt.annotate(equation, xy=(1993,360), xytext=(1960,420),
                  arrowprops=dict(facecolor='black', shrink=0.01))
     
@@ -312,7 +358,8 @@ def plotGlobalCo2():
 
 
 
-
+#takes co2 data from countries
+#outputs to graph
 def plotCo2Data():
 
     global count
@@ -347,6 +394,7 @@ def plotCo2Data():
     plt.xlim(1992, 2020)
     plt.ylim(0, 22)
 
+    #set up x y axis labels
     plt.ylabel("CO2 Change (PPM)")
     plt.xlabel("Years")
 
